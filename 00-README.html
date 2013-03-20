@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>README</title>
+</head>
+<body>
+
+<p>
+<a href="./">This directory</a>
+may eventually contain RPMS to automatically install all the  dependencies
+necessary to run OMERO. For now it is a work in progress.
+</p>
+
+<p>
+At present the only useful packages are:
+</p>
+<ul><li>
+  <a href="python-tables-2.4.0-1.ome6.x86_64.rpm">
+    python-tables-2.4.0-1.ome6.x86_64.rpm
+  </a>
+</li></ul>
+<p>
+which depends on
+</p>
+<ul><li>
+  <a href="python-numexpr-1.4.2-1.ome6.x86_64.rpm">
+    python-numexpr-1.4.2-1.ome6.x86_64.rpm
+  </a>
+</li></ul>
+
+<p>
+Download these two RPMs, and run
+</p>
+<blockquote style="font-family: monospace;">
+  yum localinstall python-tables-2.4.0-1.ome6.x86_64.rpm python-numexpr-1.4.2-1.ome6.x86_64.rpm
+</blockquote>
+<p>
+to automatically install any dependencies from the standard
+<a href="http://www.centos.org/">CentOS</a>
+and
+<a href="http://fedoraproject.org/wiki/EPEL/FAQ#How_can_I_install_the_packages_from_the_EPEL_software_repository.3F">EPEL</a>
+repositories.
+</p>
+
+</body>
+</html>
+
