@@ -10,7 +10,7 @@ Requires:       java7 >= 1:1.7.0
 Requires:       ice >= 3.4
 Requires:       ice-java >= 3.4
 Requires:       ice-python >= 3.4
-Requires:       ice-servers >= 3.4
+#Requires:       ice-servers >= 3.4
 
 Requires:       python >= 2.6
 # If pytables 2.4 is required then it will also require numpy and
@@ -52,7 +52,7 @@ Requires:       git
 Requires:       ice-devel >= 3.4
 Requires:       ice-java-devel >= 3.4
 Requires:       ice-python-devel >= 3.4
-Requires:       ice-servers-devel >= 3.4
+#Requires:       ice-servers-devel >= 3.4
 
 %files devel
 

@@ -1,0 +1,5 @@
+[wensleydale]
+name=Custom packages for running OMERO on CentOS - $basearch
+baseurl=http://users.openmicroscopy.org.uk/~spli/RPMS/$basearch
+enabled=1
+gpgcheck=0
