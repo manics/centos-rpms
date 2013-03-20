@@ -70,7 +70,8 @@ BuildRequires: jpackage-utils
 BuildRequires: libmcpp-devel >= 2.7.2
 
 BuildRequires: ant, ant-nodeps
-BuildRequires: java7-devel >= 1:1.7.0
+#BuildRequires: java-devel >= 1:1.6.0
+#BuildRequires: java7-devel >= 1:1.7.0
 #BuildRequires: ruby, ruby-devel
 
 #
@@ -821,7 +822,8 @@ fi
 * Thu Mar 21 2013 Simon Li <spli@dundee.ac.uk> 3.4.2-1
 - Remove distribution conditionals, assumes CentOS 6 only
 - Add Java7 compilation patch from Fedora ice-3.4.2-18.fc18.src.rpm
-- Change BuildRequires, including dependency on java7-devel
+- Change BuildRequires. Note do not specify java*-devel as a dependency,
+  assume it is already installed (openjdk 1.7.0 provides java7 not java)
 
 * Wed Dec 15 2009 Mark Spruiell <mes@zeroc.com> 3.4b
 - Updates for the Ice 3.4b release.
