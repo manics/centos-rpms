@@ -14,6 +14,9 @@
 
   su - build
   rpmdev-setuptree
+
+# Convenience env vars
+  SRPMDIR=~/rpmbuild/SRPMS
   RPMDIR=~/rpmbuild/RPMS/x86_64/
   MOCKRPMDIR=/var/lib/mock/epel-6-x86_64/result/
 
@@ -28,7 +31,7 @@
 # Note if this is installed on CentOS it will overwrite the existing older
 # version
 
-  cd ~/rpmbuild/SRPMS/
+  cd $SRPMDIR
   wget http://dl.fedoraproject.org/pub/fedora/linux/updates/18/SRPMS/numpy-1.7.0-1.fc18.src.rpm
   mock --rebuild numpy-1.7.0-1.fc18.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
@@ -39,7 +42,7 @@
 # -------------------------
 # Requires numpy
 
-  cd ~/rpmbuild/SRPMS/
+  cd $SRPMDIR
   wget http://dl.fedoraproject.org/pub/fedora/linux/releases/18/Everything/source/SRPMS/p/python-numexpr-2.0.1-2.fc18.src.rpm
 
   mock -r epel-6-x86_64 --init
@@ -53,7 +56,7 @@
 # --------------------------
 # Requires numpy and numexpr
 
-  cd ~/rpmbuild/SRPMS/
+  cd $SRPMDIR
   wget http://dl.fedoraproject.org/pub/fedora/linux/releases/18/Everything/source/SRPMS/p/python-tables-2.4.0-1.fc18.src.rpm
 
   mock -r epel-6-x86_64 --init
@@ -80,7 +83,7 @@
 # ----------
 # Missing BuildRequires: java-devel dependency
 
-  cd ~/rpmbuild/SRPMS/
+  cd $SRPMDIR
   wget http://www.zeroc.com/download/Ice/3.4/db48-4.8.30-1ice.src.rpm
 
   mock -r epel-6-x86_64 --init
@@ -92,7 +95,7 @@
 # Jgoodies forms
 # --------------
 
-  cd ~/rpmbuild/SRPMS/
+  cd $SRPMDIR
   wget http://dl.fedoraproject.org/pub/fedora/linux/releases/17/Everything/source/SRPMS/j/jgoodies-forms-1.4.2-2.fc17.src.rpm
   mock --rebuild jgoodies-forms-1.4.2-2.fc17.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
@@ -101,17 +104,20 @@
 # Fedora ice
 # ----------
 
-#  cd ~/rpmbuild/SRPMS/
+#  cd $SRPMDIR
 #  wget http://dl.fedoraproject.org/pub/fedora/linux/releases/18/Everything/source/SRPMS/i/ice-3.4.2-18.fc18.src.rpm
 #  rpm -i ice-3.4.2-18.fc18.src.rpm
 
 # Edit spec file
 
-  cd ~/rpmbuild/SRPMS/
+  cd $SRPMDIR
   mock -r epel-6-x86_64 --init
-  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/db48-devel-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-java-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/jgoodies-forms-1.4.2-2.el6.noarch.rpm
-# ~/rpmbuild/RPMS/x86_64/mcpp-devel-2.7.2-2ice.el6.x86_64.rpm
-  mock -r epel-6-x86_64 --no-clean ice-3.4.2-18.el6.src.rpm
+  mock -r epel-6-x86_64 --install \
+    $RPMDIR/db48-devel-4.8.30-1ice.el6.x86_64.rpm \
+    $RPMDIR/db48-java-4.8.30-1ice.el6.x86_64.rpm \
+    $RPMDIR/db48-4.8.30-1ice.el6.x86_64.rpm \
+    $RPMDIR/jgoodies-forms-1.4.2-2.el6.noarch.rpm
+  mock -r epel-6-x86_64 --no-clean ice-3.4.2-18a.el6.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
@@ -122,13 +128,13 @@
 
 ## Zeroc mcpp devel
 ## ----------------
-#  cd ~/rpmbuild/SRPMS/
+#  cd $SRPMDIR
 #  wget http://www.zeroc.com/download/Ice/3.4/mcpp-devel-2.7.2-2ice.src.rpm
 #  mock --rebuild mcpp-devel-2.7.2-2ice.src.rpm
 #  cp /var/lib/mock/epel-6-x86_64/result/*.rpm ~/rpmbuild/RPMS/x86_64/
 
 
-#  cd ~/rpmbuild/SRPMS/
+#  cd $SRPMDIR
 #  wget http://www.zeroc.com/download/Ice/3.4/ice-3.4.2-1.src.rpm
 #  mock -r epel-6-x86_64 --init
 #  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/db48-devel-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-java-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/mcpp-devel-2.7.2-2ice.el6.x86_64.rpm
