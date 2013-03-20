@@ -8,7 +8,7 @@
 
 Name:           ice
 Version:        3.4.2
-Release:        18%{?dist}
+Release:        18a%{?dist}
 Summary:        ZeroC Object-Oriented middleware
 
 Group:          System Environment/Libraries
@@ -587,6 +587,11 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} php -n -d extension_dir=%{buildroot}%{php
 
 
 %changelog
+* Wed Mar 20 2013 Simon Li <spli@dundee.ac.uk> - 3.4.2-18a
+- Convert spec file from Fedora 18 to CentOS 6.3
+- Require Java7 for building
+- Require the Zeroc db48 package to avoid conflict with db4
+
 * Wed Oct 17 2012 Haïkel Guémar <hguemar@fedoraproject.org> - 3.4.2-18
 - use macroized systemd directives (closes RHBZ #850152)
 
