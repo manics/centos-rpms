@@ -70,7 +70,7 @@ BuildRequires: jpackage-utils
 BuildRequires: libmcpp-devel >= 2.7.2
 
 BuildRequires: ant, ant-nodeps
-BuildRequires: java-devel >= 1:1.6.0
+BuildRequires: java7-devel >= 1:1.7.0
 #BuildRequires: ruby, ruby-devel
 
 #
