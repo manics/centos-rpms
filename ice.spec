@@ -50,6 +50,8 @@ URL: http://www.zeroc.com/
 Source0: Ice-%{version}.tar.gz
 Source1: Ice-rpmbuild-%{version}.tar.gz
 
+Patch0:         ice-3.4.2-java7.patch
+
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 %define soversion 34
@@ -261,6 +263,7 @@ services to use a SQL database via the Qt4 SQL API.
 
 %if %{buildall}
 %setup -n Ice-%{version} -q
+%patch0 -p1 -b .java7
 %setup -q -n Ice-rpmbuild-%{version} -T -b 1
 %endif
 
