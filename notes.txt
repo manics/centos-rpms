@@ -125,7 +125,7 @@
 # Create the repository
 # =====================
 
-  createrepo $RPMDIR/..
+  createrepo $RPMDIR/
 
 Copy to publically accessible server?
 
