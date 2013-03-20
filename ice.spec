@@ -7,34 +7,18 @@
 #
 # **********************************************************************
 
-%if "%{dist}" == ".rhel5" || "%{dist}" == ".rhel6"
-  %define ruby 1
-  %define mono 0
-%else
-  %if "%{dist}" == ".sles11"
-    %define ruby 1
-    %define mono 1
-  %else
-    %define ruby 0
-    %define mono 0
-  %endif
-%endif
+%define ruby 1
+%define mono 0
 
 %define buildall 1
 %define makeopts -j1
 
 %define core_arches %{ix86} x86_64
 
-%if "%{dist}" == ".rhel5" || "%{dist}" == ".rhel6"
-  %ifarch x86_64
-    %define qt_home /usr/lib64/qt4
-  %else
-    %define qt_home /usr/lib/qt4
-  %endif
-%endif
-
-%if "%{dist}" == ".sles11"
-  %define qt_home /usr
+%ifarch x86_64
+  %define qt_home /usr/lib64/qt4
+%else
+  %define qt_home /usr/lib/qt4
 %endif
 
 #
@@ -80,7 +64,12 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: openssl-devel >= 0.9.7a
 BuildRequires: db48-devel >= 4.8.30, db48-java >= 4.8.30
 BuildRequires: jpackage-utils
-BuildRequires: mcpp-devel >= 2.7.2
+
+BuildRequires: libmcpp-devel >= 2.7.2
+
+BuildRequires: ant, ant-nodeps
+BuildRequires: java-devel >= 1:1.6.0
+#BuildRequires: ruby, ruby-devel
 
 #
 # Prerequisites for building Ice for Java:
@@ -104,25 +93,13 @@ BuildRequires: ruby-devel
 BuildRequires: mono-core >= 2.0.1, mono-devel >= 2.0.1
 %endif
 
-%if "%{dist}" == ".rhel5"
-BuildRequires: bzip2-devel >= 1.0.3
-BuildRequires: expat-devel >= 1.95.8
-BuildRequires: php-devel >= 5.1.6
-BuildRequires: python-devel >= 2.4.3
-BuildRequires: qt4-devel >= 4.2.1
-%endif
-%if "%{dist}" == ".rhel6"
 BuildRequires: bzip2-devel >= 1.0.5
 BuildRequires: expat-devel >= 2.0.1
 BuildRequires: php-devel >= 5.3.2
 BuildRequires: python-devel >= 2.6.5
-BuildRequires: qt-devel >= 4.6.2
-%endif
-%if "%{dist}" == ".sles11"
-BuildRequires: php5-devel >= 5.2.6
-BuildRequires: python-devel >= 2.6.0
-BuildRequires: libqt4-devel >= 4.4.3
-%endif
+BuildRequires: qt-devel >= 1:4.6.2
+
+BuildRequires: jgoodies-common jgoodies-looks jgoodies-forms
 
 %description
 Ice is a modern object-oriented toolkit that enables you to build
@@ -189,12 +166,7 @@ Requires: ice-utils = %{version}-%{release}
 Requires: ice-mono = %{version}-%{release}
 %endif
 # Requirements for the users
-%if "%{dist}" == ".sles11"
-Requires(pre): pwdutils
-%endif
-%if "%{dist}" == ".rhel5" || "%{dist}" == ".rhel6"
 Requires(pre): shadow-utils
-%endif
 # Requirements for the init.d services
 Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/chkconfig
@@ -261,12 +233,7 @@ Tools for developing Ice applications in Python.
 Summary: The Ice run time for PHP
 Group: System Environment/Libraries
 Requires: ice-libs = %{version}-%{release}
-%if "%{dist}" == ".sles11"
-Requires: php5
-%endif
-%if "%{dist}" == ".rhel5" || "%{dist}" == ".rhel6"
 Requires: php
-%endif
 %description php
 The Ice run time for PHP.
 
@@ -282,15 +249,7 @@ Summary: SQL database support for IceGrid and IceStorm
 Group: System Environment/Daemons
 Requires: ice-libs = %{version}-%{release}
 # Requirements for the users
-%if "%{dist}" == ".sles11"
-Requires(pre): libqt4
-%endif
-%if "%{dist}" == ".rhel5"
-Requires(pre): qt4
-%endif
-%if "%{dist}" == ".rhel6"
 Requires(pre): qt
-%endif
 %description sqldb
 Database plug-ins that allow the IceGrid registry and IceStorm
 services to use a SQL database via the Qt4 SQL API.
@@ -416,23 +375,12 @@ cp -p $RPM_BUILD_DIR/Ice-rpmbuild-%{version}/ice.pth $RPM_BUILD_ROOT%{python_sit
 cd $RPM_BUILD_DIR/Ice-%{version}/php
 make prefix=$RPM_BUILD_ROOT install
 
-%if "%{dist}" == ".rhel5" || "%{dist}" == ".rhel6"
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/php.d
 cp -p $RPM_BUILD_DIR/Ice-rpmbuild-%{version}/ice.ini $RPM_BUILD_ROOT%{_sysconfdir}/php.d
 mkdir -p $RPM_BUILD_ROOT%{_libdir}/php/modules
 mv $RPM_BUILD_ROOT/php/IcePHP.so $RPM_BUILD_ROOT%{_libdir}/php/modules
 mkdir -p $RPM_BUILD_ROOT%{_datadir}/php
 mv $RPM_BUILD_ROOT/php/* $RPM_BUILD_ROOT%{_datadir}/php
-%endif
-
-%if "%{dist}" == ".sles11"
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/php5/conf.d
-cp -p $RPM_BUILD_DIR/Ice-rpmbuild-%{version}/ice.ini $RPM_BUILD_ROOT%{_sysconfdir}/php5/conf.d
-mkdir -p $RPM_BUILD_ROOT%{_libdir}/php5/extensions
-mv $RPM_BUILD_ROOT/php/IcePHP.so $RPM_BUILD_ROOT%{_libdir}/php5/extensions
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/php5
-mv $RPM_BUILD_ROOT/php/* $RPM_BUILD_ROOT%{_datadir}/php5
-%endif
 
 #
 # Ruby
@@ -748,29 +696,18 @@ exit 0
 
 %post servers
 /sbin/ldconfig
-%if "%{dist}" != ".sles11"
 /sbin/chkconfig --add icegridregistry
 /sbin/chkconfig --add icegridnode
 /sbin/chkconfig --add glacier2router
-%endif
 
 %preun servers
 if [ $1 = 0 ]; then
-%if "%{dist}" == ".sles11"
-        /sbin/service icegridnode stop >/dev/null 2>&1 || :
-        /sbin/insserv -r icegridnode
-	/sbin/service icegridregistry stop >/dev/null 2>&1 || :
-        /sbin/insserv -r icegridregistry
-        /sbin/service glacier2router stop >/dev/null 2>&1 || :
-        /sbin/insserv -r glacier2router
-%else
         /sbin/service icegridnode stop >/dev/null 2>&1 || :
         /sbin/chkconfig --del icegridnode
 	/sbin/service icegridregistry stop >/dev/null 2>&1 || :
         /sbin/chkconfig --del icegridregistry
         /sbin/service glacier2router stop >/dev/null 2>&1 || :
         /sbin/chkconfig --del glacier2router
-%endif
 fi
 
 %postun servers
@@ -857,17 +794,9 @@ fi
 %files php
 %defattr(-, root, root, -)
 
-%if "%{dist}" == ".rhel5" || "%{dist}" == ".rhel6"
 %{_datadir}/php
 %{_libdir}/php/modules/IcePHP.so
 %config(noreplace) %{_sysconfdir}/php.d/ice.ini
-%endif
-
-%if "%{dist}" == ".sles11"
-%{_datadir}/php5
-%{_libdir}/php5/extensions
-%config(noreplace) %{_sysconfdir}/php5/conf.d/ice.ini
-%endif
 
 %files php-devel
 %defattr(-, root, root, -)
