@@ -122,7 +122,8 @@ Tools for developing Ice applications in C++.
 %package java
 Summary: Java runtime for Ice applications
 Group: System Environment/Libraries
-Requires: java >= 1:1.6.0
+#Requires: java >= 1:1.6.0
+Requires: java7 >= 1:1.7.0
 Requires: ice%{?_isa} = %{version}-%{release}
 #Requires: libdb4-java%{?_isa}
 Requires: db4-java%{?_isa}
