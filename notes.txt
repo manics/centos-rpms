@@ -9,6 +9,12 @@
   useradd build -G mock
   passwd build
 
+# Customised the mock build environment, use ome6 as the dist tag
+
+  echo "config_opts['macros']['%dist'] = \".ome6\"" > /etc/mock/ome-6-x86_64.cfg
+  sed -re "s/config_opts\['root'\] = 'epel-6-x86_64'/config_opts['root'] = 'ome-6-x86_64'/" \
+    /etc/mock/epel-6-x86_64.cfg >> /etc/mock/ome-6-x86_64.cfg
+
 
 # Remaining steps performed as user `build`
 
@@ -18,7 +24,8 @@
 # Convenience env vars
   SRPMDIR=~/rpmbuild/SRPMS
   RPMDIR=~/rpmbuild/RPMS/x86_64/
-  MOCKRPMDIR=/var/lib/mock/epel-6-x86_64/result/
+  MOCKCFG=ome-6-x86_64
+  MOCKRPMDIR=/var/lib/mock/$MOCKCFG/result/
   DISTRPM=necromancer.openmicroscopy.org:public_html/RPMS
 
 # RPMS will be under $MOCKRPMDIR
@@ -32,10 +39,10 @@
 # Note if this is installed on CentOS it will overwrite the existing older
 # version
 
-  cd $SRPMDIR
-  wget http://dl.fedoraproject.org/pub/fedora/linux/updates/18/SRPMS/numpy-1.7.0-1.fc18.src.rpm
-  mock --rebuild numpy-1.7.0-1.fc18.src.rpm
-  cp $MOCKRPMDIR/*.rpm $RPMDIR
+#  cd $SRPMDIR
+#  wget http://dl.fedoraproject.org/pub/fedora/linux/updates/18/SRPMS/numpy-1.7.0-1.fc18.src.rpm
+#  mock -r $MOCKCFG --rebuild numpy-1.7.0-1.fc18.src.rpm
+#  cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
 
@@ -45,10 +52,15 @@
 
   cd $SRPMDIR
   wget http://dl.fedoraproject.org/pub/fedora/linux/releases/18/Everything/source/SRPMS/p/python-numexpr-2.0.1-2.fc18.src.rpm
+  rpm -i python-numexpr-2.0.1-2.fc18.src.rpm
 
-  mock -r epel-6-x86_64 --init
-  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/numpy-1.7.0-1.el6.x86_64.rpm
-  mock -r epel-6-x86_64 --no-clean python-numexpr-2.0.1-2.fc18.src.rpm
+Replace the source archive with version 1.4.2 (works with numpy 1.4.1 in Centos repository) and edit the spec file appropriately
+
+  wget http://numexpr.googlecode.com/files/numexpr-1.4.2.tar.gz
+
+  rpmbuild -bs python-numexpr.spec
+
+  mock -r $MOCKCFG --rebuild python-numexpr-1.4.2-1.ome6.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
@@ -60,9 +72,9 @@
   cd $SRPMDIR
   wget http://dl.fedoraproject.org/pub/fedora/linux/releases/18/Everything/source/SRPMS/p/python-tables-2.4.0-1.fc18.src.rpm
 
-  mock -r epel-6-x86_64 --init
-  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/numpy-1.7.0-1.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/python-numexpr-2.0.1-2.el6.x86_64.rpm
-  mock -r epel-6-x86_64 --no-clean python-tables-2.4.0-1.fc18.src.rpm
+  mock -r $MOCKCFG --init
+  mock -r $MOCKCFG --install $RPMDIR/python-numexpr-1.4.2-1.ome6.x86_64.rpm
+  mock -r $MOCKCFG --no-clean python-tables-2.4.0-1.fc18.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
@@ -87,9 +99,9 @@
   cd $SRPMDIR
   wget http://www.zeroc.com/download/Ice/3.4/db48-4.8.30-1ice.src.rpm
 
-  mock -r epel-6-x86_64 --init
-  mock -r epel-6-x86_64 --install java-1.7.0-openjdk-devel
-  mock -r epel-6-x86_64 --no-clean db48-4.8.30-1ice.src.rpm
+  mock -r $MOCKCFG --init
+  mock -r $MOCKCFG --install java-1.7.0-openjdk-devel
+  mock -r $MOCKCFG --no-clean db48-4.8.30-1ice.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
@@ -112,13 +124,13 @@
 # Edit spec file
 
   cd $SRPMDIR
-  mock -r epel-6-x86_64 --init
-  mock -r epel-6-x86_64 --install \
+  mock -r $MOCKCFG --init
+  mock -r $MOCKCFG --install \
     $RPMDIR/db48-devel-4.8.30-1ice.el6.x86_64.rpm \
     $RPMDIR/db48-java-4.8.30-1ice.el6.x86_64.rpm \
     $RPMDIR/db48-4.8.30-1ice.el6.x86_64.rpm \
     $RPMDIR/jgoodies-forms-1.4.2-2.el6.noarch.rpm
-  mock -r epel-6-x86_64 --no-clean ice-3.4.2-18a.el6.src.rpm
+  mock -r $MOCKCFG --no-clean ice-3.4.2-18a.el6.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
@@ -142,17 +154,17 @@ Copy to publically accessible server?
 #  cd $SRPMDIR
 #  wget http://www.zeroc.com/download/Ice/3.4/mcpp-devel-2.7.2-2ice.src.rpm
 #  mock --rebuild mcpp-devel-2.7.2-2ice.src.rpm
-#  cp /var/lib/mock/epel-6-x86_64/result/*.rpm ~/rpmbuild/RPMS/x86_64/
+#  cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
 #  cd $SRPMDIR
 #  wget http://www.zeroc.com/download/Ice/3.4/ice-3.4.2-1.src.rpm
-#  mock -r epel-6-x86_64 --init
-#  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/db48-devel-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-java-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/mcpp-devel-2.7.2-2ice.el6.x86_64.rpm
-#  mock -r epel-6-x86_64 --install bzip2-devel expat-devel qt-devel python-devel php-devel
-#  mock -r epel-6-x86_64 --install java-1.7.0-openjdk-devel jgoodies-common jgoodies-looks ant ant-nodeps
-#  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/jgoodies-forms-1.4.2-2.el6.noarch.rpm
-#  mock -r epel-6-x86_64 --no-clean ice-3.4.2-1.src.rpm
+#  mock -r $MOCKCFG --init
+#  mock -r $MOCKCFG --install ~/rpmbuild/RPMS/x86_64/db48-devel-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-java-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/db48-4.8.30-1ice.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/mcpp-devel-2.7.2-2ice.el6.x86_64.rpm
+#  mock -r $MOCKCFG --install bzip2-devel expat-devel qt-devel python-devel php-devel
+#  mock -r $MOCKCFG --install java-1.7.0-openjdk-devel jgoodies-common jgoodies-looks ant ant-nodeps
+#  mock -r $MOCKCFG --install ~/rpmbuild/RPMS/x86_64/jgoodies-forms-1.4.2-2.el6.noarch.rpm
+#  mock -r $MOCKCFG --no-clean ice-3.4.2-1.src.rpm
 
 
 # Previous failed attempt at compiling Fedora ice
@@ -163,9 +175,9 @@ Copy to publically accessible server?
 #  mock --rebuild libdb4-4.8.30-5.fc18.src.rpm
 #  cp $MOCKRPMDIR/*.rpm $RPMDIR
 
-#  mock -r epel-6-x86_64 --init
-#  mock -r epel-6-x86_64 --install ~/rpmbuild/RPMS/x86_64/libdb4-cxx-devel-4.8.30-5.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/libdb4-cxx-4.8.30-5.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/libdb4-4.8.30-5.el6.x86_64.rpm
-#  mock -r epel-6-x86_64 --no-clean ice-3.4.2-18.fc18.src.rpm
+#  mock -r $MOCKCFG --init
+#  mock -r $MOCKCFG --install ~/rpmbuild/RPMS/x86_64/libdb4-cxx-devel-4.8.30-5.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/libdb4-cxx-4.8.30-5.el6.x86_64.rpm ~/rpmbuild/RPMS/x86_64/libdb4-4.8.30-5.el6.x86_64.rpm
+#  mock -r $MOCKCFG --no-clean ice-3.4.2-18.fc18.src.rpm
 
 
 
