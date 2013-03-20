@@ -172,6 +172,19 @@
   cp $MOCKRPMDIR/*.rpm $RPMDIR
 
 
+# Need to build the noarch components separately
+
+  cd $SRPMDIR
+  mock -r $MOCKCFG --init
+  mock -r $MOCKCFG --install $JAVADEVEL
+  mock -r $MOCKCFG --install \
+    $RPMDIR/db48-devel-4.8.30-1ice.ome6.x86_64.rpm \
+    $RPMDIR/db48-java-4.8.30-1ice.ome6.x86_64.rpm \
+    $RPMDIR/db48-4.8.30-1ice.ome6.x86_64.rpm
+  mock -r $MOCKCFG --install $RPMDIR/jgoodies-forms-1.4.2-2.ome6.noarch.rpm
+  mock -r $MOCKCFG --target=noarch --no-clean ice-3.4.2-1.ome6.src.rpm
+  cp $MOCKRPMDIR/*.rpm $RPMDIR
+
 
 # Omero dependencies?
 # ===================
