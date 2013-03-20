@@ -6,15 +6,15 @@
 
 Summary:	Fast numerical array expression evaluator for Python and NumPy
 Name:		python-%{module}
-Version:	2.0.1
-Release:	2%{?dist}
+Version:	1.4.2
+Release:	1%{?dist}
 Source0:	http://numexpr.googlecode.com/files/%{module}-%{version}.tar.gz
 License:	MIT
 Group:		Development/Languages
 URL:		http://numexpr.googlecode.com/
 
-Requires:	numpy >= 1.6
-BuildRequires:	numpy >= 1.6
+Requires:	numpy >= 1.4.1
+BuildRequires:	numpy >= 1.4.1
 BuildRequires:	python-devel
 
 
@@ -53,28 +53,5 @@ chmod 0755 %{buildroot}%{python_sitearch}/%{module}/*.so
 %{python_sitearch}/numexpr-%{version}-py*.egg-info/
 
 %changelog
-* Sat Jul 21 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.1-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
-
-* Sun Jan 8 2012  Thibault North <tnorth@fedoraproject.org> - 2.0.1-1
-- Update to 2.0.1
-
-* Sun Nov 27 2011 Thibault North <tnorth@fedoraproject.org> - 2.0-1
-- Update to 2.0
-
-* Sun Oct 30 2011 Thibault North <tnorth@fedoraproject.org> - 1.4.2-2
-- Add check section
-- Fix permissions and remove useless sections
-
-* Thu Oct 20 2011 Thibault North <tnorth@fedoraproject.org> - 1.4.2-1
-- Updated to 1.4.2
-
-* Fri Apr 29 2011 Thibault North <tnorth@fedoraproject.org> - 1.4.1-3
-- Fix buildroot issue
-
-* Tue Dec 21 2010 Thibault North <tnorth@fedoraproject.org> - 1.4.1-2
-- Fixes for the review process
-
-* Wed Nov 05 2010 Thibault North <tnorth@fedoraproject.org> - 1.4.1-1
-- Initial package based on Mandriva's one
-
+* Wed Mar 20 2013 Simon Li <spli@dundee.ac.uk> - 1.4.2-1
+- Convert spec file from Fedora 18 numexpr-2.0.1 to CentOS 6 numexpr-1.4.2
