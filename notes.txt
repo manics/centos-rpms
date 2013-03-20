@@ -19,6 +19,7 @@
   SRPMDIR=~/rpmbuild/SRPMS
   RPMDIR=~/rpmbuild/RPMS/x86_64/
   MOCKRPMDIR=/var/lib/mock/epel-6-x86_64/result/
+  DISTRPM=necromancer.openmicroscopy.org:public_html/RPMS
 
 # RPMS will be under $MOCKRPMDIR
 
@@ -119,6 +120,16 @@
     $RPMDIR/jgoodies-forms-1.4.2-2.el6.noarch.rpm
   mock -r epel-6-x86_64 --no-clean ice-3.4.2-18a.el6.src.rpm
   cp $MOCKRPMDIR/*.rpm $RPMDIR
+
+
+# Create the repository
+# =====================
+
+  createrepo $RPMDIR/..
+
+Copy to publically accessible server?
+
+  rsync -avz $RPMDIR/.. $DISTRPM
 
 
 
