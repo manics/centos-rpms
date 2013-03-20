@@ -818,6 +818,10 @@ fi
 
 
 %changelog
+* Thu Mar 21 2013 Simon Li <spli@dundee.ac.uk> 3.4.2-1
+- Remove distribution conditionals, assumes CentOS 6 only
+- Add Java7 compilation patch from Fedora ice-3.4.2-18.fc18.src.rpm
+- Change BuildRequires, including dependency on java7-devel
 
 * Wed Dec 15 2009 Mark Spruiell <mes@zeroc.com> 3.4b
 - Updates for the Ice 3.4b release.
