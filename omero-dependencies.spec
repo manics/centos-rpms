@@ -1,23 +1,23 @@
 Name:           omero-dependencies
 Version:        0.1
 Release:        1%{?dist}
-Summary:        Metapackage for OMERO dependencies
-#Source:
+Summary:        Metapackage for OMERO runtime dependencies
 License:        GPLv3
 URL:            http://www.openmicroscopy.org/
-#Source0:        
 
-Requires:       java-1.7.0-openjdk  
+Requires:       java7 >= 1:1.7.0
 
-Requires:       ice = 3.4
-Requires:       ice-java = 3.4
-Requires:       ice-python = 3.4
-Requires:       ice-servers = 3.4
+Requires:       ice >= 3.4
+Requires:       ice-java >= 3.4
+Requires:       ice-python >= 3.4
+Requires:       ice-servers >= 3.4
 
 Requires:       python >= 2.6
-# pytables 2.4 requires numpy and numexpr >= 1.4.1
-Requires:       numpy >= 1.4.1
-Requires:       tables >= 2.4.0
+# If pytables 2.4 is required then it will also require numpy and
+# numexpr >= 1.4.1, though rpm/yum should handle this automatically.
+Requires:       numpy >= 1.2.0
+Requires:       scipy
+Requires:       python-tables >= 2.1.0
 Requires:       python-matplotlib 
 Requires:       python-imaging
 
@@ -25,59 +25,38 @@ Requires:       postgresql-server >= 8.4
 Requires:       postgresql >= 8.4
 
 
-# numpy:
-BuildRequires:  gcc python-devel rpm-build
-# Also brings in cloog-ppl cpp glibc-devel glibc-headers kernel-headers libgomp mpfr ppl
-# numpy also requires:
-Requires:       atlas
-Requires:       libgfortran
-
-#python setup.py bdist_rpm
-# requires:
-# rpm-build
-# Brings in elfutils elfutils-libs gdb patch
-# install rpm, then test: import numpy, numpy.test()
-
-# numexpr required by tables
-# http://code.google.com/p/numexpr/
-#python setup.py bdist_rpm
-
-# tables:
-Requires:       Cython
-Requires:       hdf5 >= 1.8.4
-Requires:       numexpr >= 1.4.1
-Requires:       lzo
-Requires:       bzip2
-#(lzo* and bzip2* are optional)
-#rpm -ivh http://www.mirrorservice.org/sites/dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-BuildRequires:  hdf5-devel lzo-devel bzip2-devel
-# also brings in lzo-minilzo
-#python setup.py bdist_rpm
-
-
 
 %description
-This is a metapackage to automatically install the dependencies required to
-run OMERO.server. It does not install OMERO.
-
-
-#%prep
-#%setup -q
-
-
-#%build
-#%configure
-#make %{?_smp_mflags}
-
-
-#%install
-#rm -rf $RPM_BUILD_ROOT
-#%make_install
-
+This is a metapackage to automatically install the main dependencies required
+to run OMERO. It does not install OMERO.
 
 %files
-%doc
 
+
+
+%package devel
+Summary:        Metapackage for OMERO development dependencies
+
+%description devel
+This is a metapackage to automatically install some of the main dependencies
+required to contribute to the development of OMERO.
+
+Requires:       omero-dependencies = %{version}-%{release}
+
+Requires:       java7-devel >= 1:1.7.0
+Requires:       ant
+Requires:       gcc
+Requires:       gcc-c++
+Requires:       git
+
+Requires:       ice-devel >= 3.4
+Requires:       ice-java-devel >= 3.4
+Requires:       ice-python-devel >= 3.4
+Requires:       ice-servers-devel >= 3.4
+
+%files devel
 
 
 %changelog
+* Wed Mar 20 2013 Simon Li <spli@dundee.ac.uk> - 3.4.2-18a
+- Initial attempt at a metapackage to install OMERO dependencies on CentOS 6.3
