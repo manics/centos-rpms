@@ -36,7 +36,7 @@
 # We put everything in sitearch because we're building a single
 # ice-ruby arch-specific package.
 #
-%{!?ruby_sitearch: %define ruby_sitearch %(ruby -rrbconfig -e 'puts Config::CONFIG["sitearchdir"]')}
+%{!?ruby_sitearch: %define ruby_sitearch %(ruby -rrbconfig -e 'puts Config::CONFIG["sitearchdir"]' 2> /dev/null)}
 %endif
 
 Name: ice
@@ -88,7 +88,7 @@ BuildRequires: java-devel >= 1:1.6.0
 #
 
 %if %{ruby}
-BuildRequires: ruby-devel
+BuildRequires: ruby, ruby-devel
 %endif
 
 %if %{mono}
