@@ -1,5 +1,6 @@
 # Get Python and Ruby packages into sitearch (see Fedora Wiki)
 %{!?python_sitearch: %define python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)")}
+%{!?ruby_vendorarchdir: %define ruby_vendorarchdir %(ruby -rrbconfig -e 'puts Config::CONFIG["vendorarchdir"]' 2> /dev/null)}
 
 %global php_extdir %(php-config --extension-dir 2>/dev/null || echo %{_libdir}/php4)
 %global php_apiver %((echo 0; php -i 2>/dev/null | sed -n 's/^PHP API => //p') | tail -1)
@@ -51,7 +52,7 @@ Patch8:         ice-3.4.2-gcc47.patch
 # ARM
 Patch9:         ice-3.4.2-arm.patch
 # libdb4
-Patch10:        ice-3.4.2-libdb4.patch
+#Patch10:        ice-3.4.2-libdb4.patch
 
 # Ice doesn't officially support ppc64 at all
 ExcludeArch:    ppc64
@@ -64,17 +65,21 @@ ExcludeArch:    ppc64
 # Some file suffixes we need to grab the right stuff for the file lists
 %define soversion 34
 
-BuildRequires: libdb4-cxx-devel, expat-devel, openssl-devel, bzip2-devel
-BuildRequires: ant, ant-nodeps, jpackage-utils, libdb4-java
+#BuildRequires: libdb4-cxx-devel, expat-devel, openssl-devel, bzip2-devel
+BuildRequires: db4-devel, expat-devel, openssl-devel, bzip2-devel
+#BuildRequires: ant, ant-nodeps, jpackage-utils, libdb4-java
+BuildRequires: ant, ant-nodeps, jpackage-utils, db4-java
 BuildRequires: php, php-devel
-BuildRequires: ruby, ruby(abi) = 1.9.1, ruby-devel
+#BuildRequires: ruby, ruby(abi) = 1.9.1, ruby-devel
+BuildRequires: ruby, ruby-devel
 BuildRequires: python-devel
 %if 0%{?with_mono}
 BuildRequires: mono-core, mono-devel
 %endif
 BuildRequires: libmcpp-devel >= 2.7.2
 BuildRequires: dos2unix
-BuildRequires: java-devel >= 1:1.6.0
+#BuildRequires: java-devel >= 1:1.6.0
+BuildRequires: java7-devel >= 1:1.7.0
 BuildRequires: jgoodies-forms jgoodies-looks
 BuildRequires: /usr/bin/convert
 BuildRequires: desktop-file-utils
@@ -119,7 +124,8 @@ Summary: Java runtime for Ice applications
 Group: System Environment/Libraries
 Requires: java >= 1:1.6.0
 Requires: ice%{?_isa} = %{version}-%{release}
-Requires: libdb4-java%{?_isa}
+#Requires: libdb4-java%{?_isa}
+Requires: db4-java%{?_isa}
 %description java
 The Ice runtime for Java
 
@@ -162,7 +168,7 @@ Tools for developing Ice applications in C#.
 Summary: Ruby runtime for Ice applications
 Group: Development/Tools
 Requires: ice%{?_isa} = %{version}-%{release}
-Requires: ruby(abi) = 1.9.1
+#Requires: ruby(abi) = 1.9.1
 %description ruby
 The Ice runtime for Ruby applications.
 
@@ -222,7 +228,7 @@ Tools for developing Ice applications in PHP.
 %patch7 -p1 -b .slice2cpp
 %patch8 -p1 -b .gcc47
 %patch9 -p1 -b .arm
-%patch10 -p1 -b .libdb4
+#patch10 -p1 -b .libdb4
 
 tar xf %{SOURCE1}
 rm -f ice-3.4.2-man-pages/slice2docbook.1
@@ -277,7 +283,7 @@ sed -i -e "s#DIR#%{_datadir}/Ice-%{version}#" $RPM_BUILD_ROOT%{_bindir}/icegridg
 %if 0%{?rhel}
 desktop-file-install \
         --dir=%{buildroot}%{_datadir}/applications \
-        --vendor = zeroc \
+        --vendor=zeroc \
         %{SOURCE3}
 %else
 desktop-file-install \
