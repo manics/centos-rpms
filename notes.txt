@@ -37,8 +37,7 @@
 
 # Build the latest numpy from Fedora
 # ----------------------------------
-# Note if this is installed on CentOS it will overwrite the existing older
-# version
+# Note this isn't necessary, the CentOS version should work
 
   #cd $SRPMDIR
   #wget http://dl.fedoraproject.org/pub/fedora/linux/updates/18/SRPMS/numpy-1.7.0-1.fc18.src.rpm
