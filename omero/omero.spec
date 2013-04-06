@@ -20,7 +20,7 @@ BuildRequires:  ice-python-devel >= 3.4
 
 # This is a metapackage, which just requires it's subpackages
 Requires:       omero-server = %{version}-%{release}
-Requires:       omero-client = %{version}-%{release}
+Requires:       omero-clients = %{version}-%{release}
 
 %global omerodir %{buildroot}/opt/omero
 %global __jar_repack 0
