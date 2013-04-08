@@ -18,3 +18,7 @@ Setup PostgreSQL
 Now follow the setup instructions in the omero-bin-server rpm description:
     rpm -qi omero-bin-server
 
+When finished make sure /proc is unmounted otherwise it will not be possible
+to remove the chroot:
+    umount /proc
+
