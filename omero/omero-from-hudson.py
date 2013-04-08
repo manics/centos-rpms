@@ -1,6 +1,38 @@
 #!/usr/bin/env python
 #
 
+# Instructions
+# ------------
+#
+# Use this script to help create a set of installable OMERO rpms using the
+# prebuilt binaries from the latest Hudson stable job.
+#
+# This assumes a standard rpmbuild directory structure:
+#     rpmbuild/
+#         BUILD/
+#         BUILDROOT/
+#         RPMS/
+#         SOURCES/
+#         SPECS/
+#         SRPMS/
+#         tmp/
+#
+# Change into the SPECS directory:
+#     cd rpmbuild/SPECS
+# Run:
+#     omero-from-hudson.py
+# This will download the last successful OMERO-stable Hudson artifacts sources
+# to rpmbuild/SOURCES and create a rpm spec file in the current directory.
+#
+# Build the source RPM:
+#     rpmbuild -bs omero-bin-[VERSION].spec
+# Now build the binary rpm, either directly:
+#     rpmbuild -bb ../SRPMS/omero-bin-[VERSION].[DIST].src.rpm
+# or using mock (this assumes a customised mock setup called omelocal-6-x86_64,
+# see the mock-configs directory):
+#     mock -r omelocal-6-x86_64 --rebuild \
+#         ../SRPMS/omero-bin-[VERSION].[DIST].src.rpm
+
 import ast
 import os
 import re
