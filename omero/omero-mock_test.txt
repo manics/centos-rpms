@@ -1,0 +1,20 @@
+Testing the omero RPMS using mock
+---------------------------------
+Using CentOS 6.3 mock
+
+Install the built OMERO RPMs
+    mock -r omelocal-6-x86_64 --install omero-bin
+
+chroot:
+    sudo chroot /var/lib/mock/omelocal-6-x86_64/root/
+
+The chroot isn't fully configured, so do the following:
+    echo HOSTNAME=localhost > /etc/sysconfig/network
+    mount -t proc proc /proc
+Setup PostgreSQL
+    service postgresql initdb
+    service postgresql start
+
+Now follow the setup instructions in the omero-bin-server rpm description:
+    rpm -qi omero-bin-server
+
