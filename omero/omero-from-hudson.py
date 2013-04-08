@@ -152,8 +152,9 @@ setup the database and configure OMERO:
 
 Configure PostgreSQL to use md5 password authentication (this assumes
 PostgreSQL is already running):
-	su - postgres -c "sed -i.omero -re 's/(127.0.0.1\/32\s+)ident/\\1md5/' \
-		-e 's/(::1\/128\s+)ident/\1md5/' \
+	su - postgres -c "sed -i.omero -re \\
+		's/(127.0.0.1\\/32\s+)ident/\\1md5/' \\
+		-e 's/(::1\\/128\s+)ident/\\1md5/' \\
 		/var/lib/pgsql/data/pg_hba.conf"
 	su - -c "service postgresql reload"
 
