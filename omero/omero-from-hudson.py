@@ -61,17 +61,22 @@ Source1:        %HUDSON_SOURCE_URL%OMERO.insight-%BUILD_VERSION%.zip
 Source2:        %HUDSON_SOURCE_URL%OMERO.importer-%BUILD_VERSION%.zip
 
 %if 0%{?fedora}
-BuildRequires:  java-devel >= 1:1.7.0
+#BuildRequires:  java-devel >= 1:1.7.0
 %else
-BuildRequires:  java7-devel >= 1:1.7.0
+#BuildRequires:  java7-devel >= 1:1.7.0
 %endif
+
+
 
 # This is a metapackage, which just requires it's subpackages
 Requires:       omero-server = %{version}
 Requires:       omero-clients = %{version}
 
 %global omerodir /opt/omero
+# Binaries are prebuilt, so don't do any post-processing
 %global __os_install_post %{nil}
+# We don't want internal libraries to be used by any other packages
+AutoProv:       no
 
 
 %description
@@ -90,7 +95,7 @@ Requires:       java7 >= 1:1.7.0
 Requires:       ice >= 3.4
 Requires:       ice-java >= 3.4
 Requires:       ice-python >= 3.4
-#Requires:       ice-servers >= 3.4
+Requires:       ice-servers >= 3.4
 
 Requires:       python >= 2.6
 # If pytables 2.4 is required then it will also require numpy and
@@ -110,6 +115,37 @@ Provides:       omero-server = %{version}
 OMERO server components.
 This RPM is created from Hudson build %HUDSON_SOURCE_URL%
 
+After installing this for the first time run the following commands to
+setup the database and configure OMERO:
+
+Configure PostgreSQL to use md5 password authentication (this assumes
+PostgreSQL is already running):
+	su - postgres -c "sed -i.omero -re 's/(127.0.0.1\/32\s+)ident/\1md5/' \
+		-e 's/(::1\/128\s+)ident/\1md5/' \
+		/var/lib/pgsql/data/pg_hba.conf"
+	su - -c "service postgresql reload"
+
+Create a database user (this will prompt for a database password) and database:
+	su - postgres -c "createuser -DRSP omero"
+	su - postgres -c "createdb -E UTF8 -O omero omero"
+If the previous line fails then try:
+	su - postgres -c "createdb -E UTF8 -T template0 -O omero omero"
+	su - postgres -c "createlang plpgsql omero"
+
+Configure OMERO:
+	su - omero
+	%{omerodir}/server/bin/omero config set omero.db.name omero
+	%{omerodir}/server/bin/omero config set omero.db.user omero
+	%{omerodir}/server/bin/omero config set omero.db.pass DATABASEPASSWORD
+If you want to change the data directory configure it with:
+	%{omerodir}/server/bin/omero config set omero.data.dir /OMERO
+Setup the database:
+	cd %{omerodir}/server/var
+	%{omerodir}/server/bin/omero db script
+	psql -hlocalhost -Uomero omero < %{omerodir}/server/var/OMERO4.4__0.sql
+
+
+
 
 %pre server
 getent group omero > /dev/null || groupadd -r omero
@@ -120,10 +156,8 @@ getent passwd omero > /dev/null || \
     useradd -r -g omero -d %{omerodir}/server/var -c "omero server" omero
 exit 0
 
-%post server
-su - postgres -c "createuser -DRS omero"
-su - postgres -c "createdb -O omero omero"
-
+#post server
+#See description server
 
 
 %package clients
@@ -158,7 +192,7 @@ cp -a OMERO.server-%BUILD_VERSION% %{buildroot}%{omerodir}/server
 cp -a OMERO.insight-%BUILD_VERSION% %{buildroot}%{omerodir}/insight
 cp -a OMERO.importer-%BUILD_VERSION% %{buildroot}%{omerodir}/importer
 mkdir %{buildroot}%{omerodir}/server/var
-mkdir %{buildroot}/omero
+mkdir %{buildroot}/OMERO
 
 
 %files
@@ -169,14 +203,16 @@ mkdir %{buildroot}/omero
 %dir %{omerodir}
 %dir %{omerodir}/server
 %{omerodir}/server/bin
-%{omerodir}/server/etc
+%attr(-,omero,omero) %{omerodir}/server/etc/grid
+%{omerodir}/server/etc/*.*
+%{omerodir}/server/etc/profiles
 %{omerodir}/server/include
 %{omerodir}/server/lib
 %{omerodir}/server/licenses
 %{omerodir}/server/LICENSE.txt
 %{omerodir}/server/sql
 %attr(-,omero,omero) %{omerodir}/server/var
-%attr(-,omero,omero) /omero
+%attr(-,omero,omero) /OMERO
 
 
 %files clients
@@ -203,3 +239,4 @@ specfile = 'omero-bin-%s.spec' % version[0]
 print 'Writing %s' % specfile
 with open(specfile, 'w') as f:
     f.write(rpmspec)
+
