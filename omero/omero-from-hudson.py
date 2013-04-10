@@ -224,8 +224,11 @@ mkdir -p %{buildroot}%{omerodir}
 cp -a OMERO.server-%BUILD_VERSION% %{buildroot}%{omerodir}/server
 cp -a OMERO.insight-%BUILD_VERSION% %{buildroot}%{omerodir}/insight
 cp -a OMERO.importer-%BUILD_VERSION% %{buildroot}%{omerodir}/importer
+# The following directories need to be writable by omero. Create them
+# here so that we can set the required permissions.
 mkdir %{buildroot}%{omerodir}/server/var
 mkdir %{buildroot}/OMERO
+mkdir %{buildroot}%{omerodir}/server/lib/scripts/.omero
 
 
 %files
@@ -240,7 +243,18 @@ mkdir %{buildroot}/OMERO
 %{omerodir}/server/etc/*.*
 %{omerodir}/server/etc/profiles
 %{omerodir}/server/include
-%{omerodir}/server/lib
+%dir %{omerodir}/server/lib
+%{omerodir}/server/lib/client
+%{omerodir}/server/lib/fallback
+%{omerodir}/server/lib/insight
+%{omerodir}/server/lib/prefs.class
+%{omerodir}/server/lib/python
+%{omerodir}/server/lib/server
+%dir %{omerodir}/server/lib/scripts
+%{omerodir}/server/lib/scripts/omero
+%{omerodir}/server/lib/scripts/README.txt
+%{omerodir}/server/lib/scripts/.git*
+%attr(-,omero,omero) %{omerodir}/server/lib/scripts/.omero
 %{omerodir}/server/licenses
 %{omerodir}/server/LICENSE.txt
 %{omerodir}/server/sql
