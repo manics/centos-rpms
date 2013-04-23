@@ -24,6 +24,14 @@
 # This will download the last successful OMERO-stable Hudson artifacts sources
 # to rpmbuild/SOURCES and create a rpm spec file in the current directory.
 #
+# Copy the following files from the directory containing this script into into
+# rpmbuild/SOURCES
+#     omero-init.d
+#     omero-web-init.d
+#     omero-initdb.sh
+# The first two are the modified init.d scripts based on the files in
+# docs/install/VM/
+#
 # Build the source RPM:
 #     rpmbuild -bs omero-bin-[VERSION].spec
 # Now build the binary rpm, either directly:
@@ -57,7 +65,7 @@ def downloadArtifact(url, dest, overwrite=False):
         finally:
             r.close()
 
-versionre = '((\d+\.\d+\.\d+)-(\d+)-(\w+)-ice34-b(\d+))'
+versionre = '((\d+\.\d+\.\d+)-(\w+)-(\w+-)?ice34-b(\d+))'
 required = [('OMERO.server-', '.zip'),
             ('OMERO.insight-', '.zip'),
             ('OMERO.importer-', '.zip')]
@@ -91,6 +99,9 @@ URL:            http://www.openmicroscopy.org/
 Source0:        %HUDSON_SOURCE_URL%OMERO.server-%BUILD_VERSION%.zip
 Source1:        %HUDSON_SOURCE_URL%OMERO.insight-%BUILD_VERSION%.zip
 Source2:        %HUDSON_SOURCE_URL%OMERO.importer-%BUILD_VERSION%.zip
+Source3:        omero-init.d
+Source4:        omero-web-init.d
+Source5:        omero-initdb.sh
 
 %if 0%{?fedora}
 #BuildRequires:  java-devel >= 1:1.7.0
@@ -104,7 +115,7 @@ Source2:        %HUDSON_SOURCE_URL%OMERO.importer-%BUILD_VERSION%.zip
 Requires:       omero-server = %{version}
 Requires:       omero-clients = %{version}
 
-%global omerodir /opt/omero
+%global omerodir /opt/omero44
 # Binaries are prebuilt, so don't do any post-processing
 %global __os_install_post %{nil}
 # We don't want internal libraries to be used by any other packages
@@ -147,35 +158,9 @@ Provides:       omero-server = %{version}
 OMERO server components.
 This RPM is created from Hudson build %HUDSON_SOURCE_URL%
 
-After installing this for the first time run the following commands to
-setup the database and configure OMERO:
-
-Configure PostgreSQL to use md5 password authentication (this assumes
-PostgreSQL is already running):
-	su - postgres -c "sed -i.omero -re \\
-		's/(127.0.0.1\\/32\s+)ident/\\1md5/' \\
-		-e 's/(::1\\/128\s+)ident/\\1md5/' \\
-		/var/lib/pgsql/data/pg_hba.conf"
-	su - -c "service postgresql reload"
-
-Create a database user (this will prompt for a database password) and database:
-	su - postgres -c "createuser -DRSP omero"
-	su - postgres -c "createdb -E UTF8 -O omero omero"
-If the previous line fails then try:
-	su - postgres -c "createdb -E UTF8 -T template0 -O omero omero"
-	su - postgres -c "createlang plpgsql omero"
-
-Configure OMERO:
-	su - omero
-	%{omerodir}/server/bin/omero config set omero.db.name omero
-	%{omerodir}/server/bin/omero config set omero.db.user omero
-	%{omerodir}/server/bin/omero config set omero.db.pass DATABASEPASSWORD
-If you want to change the data directory configure it with:
-	%{omerodir}/server/bin/omero config set omero.data.dir /OMERO
-Setup the database:
-	cd %{omerodir}/server/var
-	%{omerodir}/server/bin/omero db script
-	psql -hlocalhost -Uomero omero < %{omerodir}/server/var/OMERO4.4__0.sql
+After installing this for the first time run the commands listed in
+%{omerodir}/server/bin/omero-initdb.sh to setup the database and configure
+OMERO.
 
 
 
@@ -189,8 +174,24 @@ getent passwd omero > /dev/null || \
     useradd -r -g omero -d %{omerodir}/server/var -c "omero server" omero
 exit 0
 
-#post server
-#See description server
+%post server
+/sbin/chkconfig --add omero
+/sbin/chkconfig --add omero-web
+
+%preun server
+if [ $1 = 0 ] ; then
+	/sbin/service omero-web stop >/dev/null 2>&1
+	/sbin/service omero stop >/dev/null 2>&1
+	/sbin/chkconfig --del omero-web
+	/sbin/chkconfig --del omero
+fi
+
+#postun server
+#if [ $1 -ge 1 ] ; then
+#	/sbin/service omero condrestart >/dev/null 2>&1 || :
+#	/sbin/service omero-web condrestart >/dev/null 2>&1 || :
+#fi
+
 
 
 %package clients
@@ -213,9 +214,12 @@ This RPM is created from Hudson build %HUDSON_SOURCE_URL%
 %setup -c
 %setup -D -T -a 1
 %setup -D -T -a 2
+cp %{SOURCE3} .
+cp %{SOURCE4} .
+cp %{SOURCE5} .
 
 %build
-
+rm OMERO.server-%BUILD_VERSION%/lib/python/omeroweb/.gitignore
 
 %install
 rm -rf %{buildroot}
@@ -224,12 +228,21 @@ mkdir -p %{buildroot}%{omerodir}
 cp -a OMERO.server-%BUILD_VERSION% %{buildroot}%{omerodir}/server
 cp -a OMERO.insight-%BUILD_VERSION% %{buildroot}%{omerodir}/insight
 cp -a OMERO.importer-%BUILD_VERSION% %{buildroot}%{omerodir}/importer
+
 # The following directories need to be writable by omero. Create them
 # here so that we can set the required permissions.
 mkdir %{buildroot}%{omerodir}/server/var
 mkdir %{buildroot}/OMERO
 mkdir %{buildroot}%{omerodir}/server/lib/scripts/.omero
+mkdir %{buildroot}%{omerodir}/server/lib/python/omeroweb/static
 
+mkdir -p %{buildroot}%{omerodir}/server/etc/init.d
+mkdir -p %{buildroot}%{_initddir}
+cp omero-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero
+cp omero-web-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero-web
+ln -s %{omerodir}/server/etc/init.d/omero %{buildroot}%{_initddir}/omero
+ln -s %{omerodir}/server/etc/init.d/omero-web %{buildroot}%{_initddir}/omero-web
+cp omero-initdb.sh %{buildroot}%{omerodir}/server/bin
 
 %files
 
@@ -248,7 +261,18 @@ mkdir %{buildroot}%{omerodir}/server/lib/scripts/.omero
 %{omerodir}/server/lib/fallback
 %{omerodir}/server/lib/insight
 %{omerodir}/server/lib/prefs.class
-%{omerodir}/server/lib/python
+%dir %{omerodir}/server/lib/python
+%{omerodir}/server/lib/python/*.*
+%{omerodir}/server/lib/python/django
+%{omerodir}/server/lib/python/flup
+%{omerodir}/server/lib/python/omero
+%{omerodir}/server/lib/python/omero_ext
+%dir %{omerodir}/server/lib/python/omeroweb/
+%{omerodir}/server/lib/python/omeroweb/*.*
+%{omerodir}/server/lib/python/omeroweb/feedback
+%{omerodir}/server/lib/python/omeroweb/license
+%{omerodir}/server/lib/python/omeroweb/web*
+%attr(-,omero,omero) %{omerodir}/server/lib/python/omeroweb/static
 %{omerodir}/server/lib/server
 %dir %{omerodir}/server/lib/scripts
 %{omerodir}/server/lib/scripts/omero
@@ -260,7 +284,8 @@ mkdir %{buildroot}%{omerodir}/server/lib/scripts/.omero
 %{omerodir}/server/sql
 %attr(-,omero,omero) %{omerodir}/server/var
 %attr(-,omero,omero) /OMERO
-
+%{_initddir}/omero
+%{_initddir}/omero-web
 
 %files clients
 %defattr(-,root,root)
