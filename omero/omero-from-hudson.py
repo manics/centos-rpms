@@ -102,6 +102,7 @@ Source2:        %HUDSON_SOURCE_URL%OMERO.importer-%BUILD_VERSION%.zip
 Source3:        omero-init.d
 Source4:        omero-web-init.d
 Source5:        omero-initdb.sh
+Source6:        omero-httpd.conf
 
 %if 0%{?fedora}
 #BuildRequires:  java-devel >= 1:1.7.0
@@ -176,19 +177,45 @@ exit 0
 
 %post server
 /sbin/chkconfig --add omero
-/sbin/chkconfig --add omero-web
 
 %preun server
 if [ $1 = 0 ] ; then
-	/sbin/service omero-web stop >/dev/null 2>&1
 	/sbin/service omero stop >/dev/null 2>&1
-	/sbin/chkconfig --del omero-web
 	/sbin/chkconfig --del omero
 fi
 
 #postun server
 #if [ $1 -ge 1 ] ; then
 #	/sbin/service omero condrestart >/dev/null 2>&1 || :
+#fi
+
+
+
+%package web
+Summary:        OMERO web
+
+Requires:       httpd >= 2.2
+Requires:       mod_fastcgi >= 2.4
+
+Requires:       omero-server = %{version}
+Provides:       omero-web = %{version}
+
+%description web
+OMERO web startup scripts.
+This RPM is created from Hudson build %HUDSON_SOURCE_URL%
+
+
+%post web
+/sbin/chkconfig --add omero-web
+
+%preun web
+if [ $1 = 0 ] ; then
+	/sbin/service omero-web stop >/dev/null 2>&1
+	/sbin/chkconfig --del omero-web
+fi
+
+#postun web
+#if [ $1 -ge 1 ] ; then
 #	/sbin/service omero-web condrestart >/dev/null 2>&1 || :
 #fi
 
@@ -217,6 +244,7 @@ This RPM is created from Hudson build %HUDSON_SOURCE_URL%
 cp %{SOURCE3} .
 cp %{SOURCE4} .
 cp %{SOURCE5} .
+cp %{SOURCE6} .
 
 %build
 rm OMERO.server-%BUILD_VERSION%/lib/python/omeroweb/.gitignore
@@ -239,10 +267,14 @@ mkdir %{buildroot}%{omerodir}/server/lib/python/omeroweb/static
 mkdir -p %{buildroot}%{omerodir}/server/etc/init.d
 mkdir -p %{buildroot}%{_initddir}
 cp omero-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero
-cp omero-web-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero-web
 ln -s %{omerodir}/server/etc/init.d/omero %{buildroot}%{_initddir}/omero
-ln -s %{omerodir}/server/etc/init.d/omero-web %{buildroot}%{_initddir}/omero-web
 cp omero-initdb.sh %{buildroot}%{omerodir}/server/bin
+
+cp omero-web-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero-web
+ln -s %{omerodir}/server/etc/init.d/omero-web %{buildroot}%{_initddir}/omero-web
+mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d/
+cp omero-httpd.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/omero.conf
+
 
 %files
 
@@ -253,7 +285,14 @@ cp omero-initdb.sh %{buildroot}%{omerodir}/server/bin
 %dir %{omerodir}/server
 %{omerodir}/server/bin
 %attr(-,omero,omero) %{omerodir}/server/etc/grid
-%{omerodir}/server/etc/*.*
+%{omerodir}/server/etc/*.bat
+%{omerodir}/server/etc/*.cfg
+%{omerodir}/server/etc/*.config
+%{omerodir}/server/etc/*.properties*
+%{omerodir}/server/etc/*.sh
+%{omerodir}/server/etc/*.template
+%{omerodir}/server/etc/*.types
+%{omerodir}/server/etc/*.xml
 %{omerodir}/server/etc/profiles
 %{omerodir}/server/include
 %dir %{omerodir}/server/lib
@@ -284,8 +323,16 @@ cp omero-initdb.sh %{buildroot}%{omerodir}/server/bin
 %{omerodir}/server/sql
 %attr(-,omero,omero) %{omerodir}/server/var
 %attr(-,omero,omero) /OMERO
+%dir %{omerodir}/server/etc/init.d
 %{_initddir}/omero
+%{omerodir}/server/etc/init.d/omero
+
+
+%files web
 %{_initddir}/omero-web
+%{omerodir}/server/etc/init.d/omero-web
+%{_sysconfdir}/httpd/conf.d/omero.conf
+
 
 %files clients
 %defattr(-,root,root)
