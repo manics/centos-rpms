@@ -114,6 +114,7 @@ Source6:        omero-httpd.conf
 
 # This is a metapackage, which just requires it's subpackages
 Requires:       omero-server = %{version}
+Requires:       omero-web = %{version}
 Requires:       omero-clients = %{version}
 
 %global omerodir /opt/omero44
@@ -284,16 +285,19 @@ cp omero-httpd.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/omero.conf
 %dir %{omerodir}
 %dir %{omerodir}/server
 %{omerodir}/server/bin
-%attr(-,omero,omero) %{omerodir}/server/etc/grid
-%{omerodir}/server/etc/*.bat
-%{omerodir}/server/etc/*.cfg
-%{omerodir}/server/etc/*.config
-%{omerodir}/server/etc/*.properties*
-%{omerodir}/server/etc/*.sh
-%{omerodir}/server/etc/*.template
-%{omerodir}/server/etc/*.types
-%{omerodir}/server/etc/*.xml
-%{omerodir}/server/etc/profiles
+%dir %attr(-,omero,omero) %{omerodir}/server/etc/grid
+%config(noreplace) %attr(-,omero,omero) %{omerodir}/server/etc/grid/*.xml
+%{omerodir}/server/etc/grid/README
+%config %{omerodir}/server/etc/*.bat
+%config %{omerodir}/server/etc/*.cfg
+%config %{omerodir}/server/etc/*.config
+%config %{omerodir}/server/etc/*.properties*
+%config %{omerodir}/server/etc/*.sh
+%config %{omerodir}/server/etc/*.template
+%config %{omerodir}/server/etc/*.types
+%config %{omerodir}/server/etc/*.xml
+%dir %{omerodir}/server/etc/profiles
+%config %{omerodir}/server/etc/profiles/*
 %{omerodir}/server/include
 %dir %{omerodir}/server/lib
 %{omerodir}/server/lib/client
@@ -325,13 +329,13 @@ cp omero-httpd.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/omero.conf
 %attr(-,omero,omero) /OMERO
 %dir %{omerodir}/server/etc/init.d
 %{_initddir}/omero
-%{omerodir}/server/etc/init.d/omero
+%config %{omerodir}/server/etc/init.d/omero
 
 
 %files web
 %{_initddir}/omero-web
-%{omerodir}/server/etc/init.d/omero-web
-%{_sysconfdir}/httpd/conf.d/omero.conf
+%config %{omerodir}/server/etc/init.d/omero-web
+%config %{_sysconfdir}/httpd/conf.d/omero.conf
 
 
 %files clients
