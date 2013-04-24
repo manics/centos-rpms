@@ -45,10 +45,20 @@ import ast
 import os
 import re
 import shutil
+import sys
 import time
 import urllib2
 
-url = 'http://hudson.openmicroscopy.org.uk/view/2.%20Stable/job/OMERO-stable-ice34/api/python?depth=1'
+
+# Allow the hudson build number to be overridden
+# Todo: Command line option
+buildnum = None
+buildnum = 241
+
+if buildnum:
+    url = 'http://hudson.openmicroscopy.org.uk/view/2.%20Stable/job/OMERO-stable-ice34/' + str(buildnum) + '/api/python?depth=1'
+else:
+    url = 'http://hudson.openmicroscopy.org.uk/view/2.%20Stable/job/OMERO-stable-ice34/api/python?depth=1'
 
 rpm_source_dir = '../SOURCES/'
 
@@ -65,13 +75,20 @@ def downloadArtifact(url, dest, overwrite=False):
         finally:
             r.close()
 
-versionre = '((\d+\.\d+\.\d+)-(\w+)-(\w+-)?ice34-b(\d+))'
+versionre = '((\d+\.\d+\.\d+)-(\w+)-([\w-]+)?ice34-b(\d+))'
 required = [('OMERO.server-', '.zip'),
             ('OMERO.insight-', '.zip'),
             ('OMERO.importer-', '.zip')]
 
 a = ast.literal_eval(urllib2.urlopen(url).read())
-lastSuccess = a['lastSuccessfulBuild']
+if buildnum:
+    lastSuccess = a
+else:
+    lastSuccess = a['lastSuccessfulBuild']
+
+if lastSuccess['result'] != 'SUCCESS':
+    print 'ERROR: Hudson build was not successful: %s' % lastSuccess['result']
+
 baseurl = lastSuccess['url'] + 'artifact/'
 arts = [(b['fileName'], baseurl + b['relativePath'])
         for b in lastSuccess['artifacts']]
