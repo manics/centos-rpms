@@ -14,7 +14,10 @@ BuildRequires: python-setuptools >= 0.6
 BuildRequires: python-devel >= 2.6
 BuildRequires: numpy >= 1.4.1
 
+# Note these are just the current CentOS 6 versions, older ones may still work
 Requires: numpy >= 1.4.1
+Requires: scipy >= 0.7.2
+Requires: freeimage >= 3.10.0
 
 
 %description
