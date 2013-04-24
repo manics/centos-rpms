@@ -1,27 +1,31 @@
-%define name PySLIC
-%define version 0.6.1
-%define unmangled_version 0.6.1
-%define unmangled_version 0.6.1
-%define release 1
+%define pyname PySLIC
 
 Summary: Subcellular Location Image Classifier
-Name: %{name}
-Version: %{version}
-Release: %{release}
-Source0: %{name}-%{unmangled_version}.tar.gz
+Name: python-%{pyname}
+Version: 0.6.1
+Release: 1
+Source0: %{pyname}-%{version}.tar.gz
 License: UNKNOWN
 Group: Development/Libraries
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-Prefix: %{_prefix}
 BuildArch: noarch
 Vendor: Murphy Lab <murphy@cmu.edu>
 Url: http://murphylab.cbi.cmu.edu/
+
+BuildRequires: python-setuptools >= 0.6
+BuildRequires: numpy >= 1.4.1
+
+Requires: numpy >= 1.4.1
+Requires: scipy >= 0.7.2
+Requires: python-mahotas >= 0.5.2
+Requires: python-milk >= 0.3.1
+Requires: python-pymorph >= 0.95
+
 
 %description
 UNKNOWN
 
 %prep
-%setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
+%setup -n %{pyname}-%{version}
 
 %build
 python setup.py build
