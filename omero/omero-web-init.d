@@ -25,7 +25,7 @@ prog="omero-web"
 # also read the omero config
 [ -r /etc/default/omero ] && . /etc/default/omero
 
-OMERO_HOME="/opt/omero44/server"
+OMERO_HOME="/opt/omero/server"
 OMERO_USER="omero"
 
 start() {	

@@ -143,7 +143,7 @@ Requires:       omero-server = %{version}
 Requires:       omero-web = %{version}
 Requires:       omero-clients = %{version}
 
-%global omerodir /opt/omero44
+%global omerodir /opt/omero
 # Binaries are prebuilt, so don't do any post-processing
 %global __os_install_post %{nil}
 # We don't want internal libraries to be used by any other packages

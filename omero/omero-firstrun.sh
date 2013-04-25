@@ -2,7 +2,7 @@
 # OMERO database initialisation script
 # This assumes the server and web components have been installed
 
-OMERO_HOME=/opt/omero44/server
+OMERO_HOME=/opt/omero/server
 OMERO_DATA_DIR=/OMERO
 PGCONFIG=/var/lib/pgsql/data/pg_hba.conf
 FASTCGICONFIG=/etc/httpd/conf.d/fastcgi.conf

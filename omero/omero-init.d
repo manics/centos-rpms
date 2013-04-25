@@ -23,7 +23,7 @@ prog="omero"
 # Read configuration variable file if it is present
 [ -r /etc/default/$prog ] && . /etc/default/$prog
 
-OMERO_HOME="/opt/omero44/server"
+OMERO_HOME="/opt/omero/server"
 OMERO_USER="omero"
 
 start() {	
