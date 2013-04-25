@@ -12,17 +12,19 @@ if [ "$(ls -A $OMERO_DATA_DIR)" ]; then
 	exit 2
 fi
 
-# Configure PostgreSQL to use md5 password authentication (this assumes
-# PostgreSQL is not yet initialised, if it is initdb will fail, ignore it):
+if [ ! -f $PGCONFIG ]; then
+	service postgresql initdb
+	service postgresql start
+fi
+
+# Configure PostgreSQL to use md5 password authentication:
 grep -E '^\s*host\s+omero\s+omero+\s+127.0.0.1/32+\s+md5\s*$' $PGCONFIG > /dev/null
 if [ $? -ne 0 ]; then
 	sed -i.omero '0,/^host.*/s//'\
 'host    omero       omero       127.0.0.1\/32          md5\n'\
 'host    omero       omero       ::1\/128               md5\n&/' \
 	$PGCONFIG
-
-	service postgresql initdb
-	service postgresql restart
+	service postgresql reload
 fi
 
 # Create a random password:
