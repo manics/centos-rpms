@@ -52,6 +52,7 @@ EOF`
 if [ -n "$APPCFG" ]; then
     su - omero -c "%{omerodir}/server/bin/omero config set omero.web.apps '$APPCFG'"
 fi
+service omero-web restart
 
 
 %files
