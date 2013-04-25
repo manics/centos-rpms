@@ -74,7 +74,12 @@ def downloadArtifact(url, dest, overwrite=False):
         finally:
             r.close()
 
-versionre = '((\d+\.\d+\.\d+)-(\w+)-([\w-]+)?ice34-b(\d+))'
+# Example version strings:
+# 4.4.6-916-6fe6155-ice34-b202
+# 4.4.7-RC1-ice34-b241
+# 4.4.7-RC1-46-708f7f0-ice34-b243
+# 4.4.7-ice34-b245
+versionre = '((\d+\.\d+\.\d+)-((\w+)-)?([\w-]+)?ice34-b(\d+))'
 required = [('OMERO.server-', '.zip'),
             ('OMERO.insight-', '.zip'),
             ('OMERO.importer-', '.zip')]
@@ -103,6 +108,11 @@ for art in arts:
                 assert(m.groups() == version)
             downloadArtifact(art[1], rpm_source_dir + art[0])
 
+build_version = version[0]
+rpm_version = version[1]
+rpm_release = version[5]
+if version[3] is not None:
+    rpm_release += '.' + version[3]
 
 rpmspec = """
 Name:           omero-bin
@@ -368,13 +378,13 @@ cp omero-httpd.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/omero.conf
 """
 
 
-rpmspec = rpmspec.replace('%BUILD_VERSION%', version[0])
+rpmspec = rpmspec.replace('%BUILD_VERSION%', build_version)
 rpmspec = rpmspec.replace('%HUDSON_SOURCE_URL%', baseurl)
-rpmspec = rpmspec.replace('%VERSION%', version[1] + '.'+ version[2])
-rpmspec = rpmspec.replace('%RELEASE%', version[4])
+rpmspec = rpmspec.replace('%VERSION%', rpm_version)
+rpmspec = rpmspec.replace('%RELEASE%', rpm_release)
 rpmspec = rpmspec.replace('%DATE%',
                           time.strftime('%a %b %e %Y', time.localtime()))
-specfile = 'omero-bin-%s.spec' % version[0]
+specfile = 'omero-bin-%s.spec' % build_version
 print 'Writing %s' % specfile
 with open(specfile, 'w') as f:
     f.write(rpmspec)
