@@ -13,6 +13,12 @@ BuildArch: noarch
 Vendor: Robert F. Murphy <murphy@cmu.edu>
 Url: http://murphylab.web.cmu.edu/software/
 
+Requires: omero-server >= 4.4.7
+
+Requires: numpy >= 1.4.1
+Requires: scipy >= 0.7.2
+Requires: python-PySLIC = 0.6.1
+
 %description
 Protein Subcellular Location Image Database for OMERO
 
