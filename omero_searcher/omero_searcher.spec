@@ -1,14 +1,14 @@
 Summary: OMERO.searcher
 Name: omero-searcher
 Version: 0.0.1
-Release: 1
+Release: 1%{?dist}
 Source0: omero-searcher.tar.gz
 License: UNKNOWN
 Group: Development/Libraries
 BuildArch: noarch
 Url: http://murphylab.web.cmu.edu/software/
 
-%global omerodir /opt/omero44
+%global omerodir /opt/omero
 
 Requires:       omero-server >= 4.4.7
 Requires:       python-pyslid
@@ -35,6 +35,24 @@ cp -a *.py templates \
 mkdir -p %{buildroot}%{omerodir}/server/lib/scripts/searcher
 cp -a scripts/*.py %{buildroot}%{omerodir}/server/lib/scripts/searcher
 mkdir -p %{buildroot}/OMERO/pyslid.data
+
+
+%post
+APPS=`su - omero -c "%{omerodir}/server/bin/omero config get omero.web.apps"`
+APPCFG=`cat <<EOF | %{__python}
+import sys
+apps = '$APPS'
+apps = [a.strip('" ') for a in apps.lstrip('[\'').rstrip(']\'').split(',')]
+apps = filter(lambda x: bool(x), apps)
+if 'omero_searcher' in apps:
+    sys.exit(0)
+apps.append('omero_searcher')
+print '[' + ','.join( ['"%s"' % a for a in apps] ) + ']'
+EOF`
+if [ -n "$APPCFG" ]; then
+    su - omero -c "%{omerodir}/server/bin/omero config set omero.web.apps '$APPCFG'"
+fi
+
 
 %files
 %{omerodir}/server/lib/python/omeroweb/omero_searcher
