@@ -28,7 +28,7 @@
 # rpmbuild/SOURCES
 #     omero-init.d
 #     omero-web-init.d
-#     omero-initdb.sh
+#     omero-firstrun.sh
 # The first two are the modified init.d scripts based on the files in
 # docs/install/VM/
 #
@@ -127,7 +127,7 @@ Source1:        %HUDSON_SOURCE_URL%OMERO.insight-%BUILD_VERSION%.zip
 Source2:        %HUDSON_SOURCE_URL%OMERO.importer-%BUILD_VERSION%.zip
 Source3:        omero-init.d
 Source4:        omero-web-init.d
-Source5:        omero-initdb.sh
+Source5:        omero-firstrun.sh
 Source6:        omero-httpd.conf
 
 %if 0%{?fedora}
@@ -187,7 +187,7 @@ OMERO server components.
 This RPM is created from Hudson build %HUDSON_SOURCE_URL%
 
 After installing this for the first time run the commands listed in
-%{omerodir}/server/bin/omero-initdb.sh to setup the database and configure
+%{omerodir}/server/bin/omero-firstrun.sh to setup the database and configure
 OMERO.
 
 
@@ -295,7 +295,7 @@ mkdir -p %{buildroot}%{omerodir}/server/etc/init.d
 mkdir -p %{buildroot}%{_initddir}
 cp omero-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero
 ln -s %{omerodir}/server/etc/init.d/omero %{buildroot}%{_initddir}/omero
-cp omero-initdb.sh %{buildroot}%{omerodir}/server/bin
+cp omero-firstrun.sh %{buildroot}%{omerodir}/server/bin
 
 cp omero-web-init.d %{buildroot}%{omerodir}/server/etc/init.d/omero-web
 ln -s %{omerodir}/server/etc/init.d/omero-web %{buildroot}%{_initddir}/omero-web
