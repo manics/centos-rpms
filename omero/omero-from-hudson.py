@@ -53,7 +53,6 @@ import urllib2
 # Allow the hudson build number to be overridden
 # Todo: Command line option
 buildnum = None
-buildnum = 241
 
 if buildnum:
     url = 'http://hudson.openmicroscopy.org.uk/view/2.%20Stable/job/OMERO-stable-ice34/' + str(buildnum) + '/api/python?depth=1'
