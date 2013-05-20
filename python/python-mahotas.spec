@@ -2,7 +2,7 @@
 
 Summary: Mahotas: Computer Vision Library
 Name: python-%{pyname}
-Version: 0.9.7
+Version: 0.9.4
 Release: 1
 Source0: %{pyname}-%{version}.tar.gz
 License: MIT
