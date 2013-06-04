@@ -50,30 +50,45 @@ import time
 import urllib2
 
 
-# Allow the hudson build number to be overridden
-if len(sys.argv) > 2:
-    sys.stderr.write('Usage: %s [buildnum]\n' % os.path.basename(sys.argv[0]))
-    sys.exit(1)
+import argparse
 
-try:
-    buildnum = sys.argv[1]
-except IndexError:
-    buildnum = None
+defaultJob = 'OMERO-stable-ice34'
 
-if buildnum:
-    url = 'http://hudson.openmicroscopy.org.uk/view/2.%20Stable/job/OMERO-stable-ice34/' + str(buildnum) + '/api/python?depth=1'
-else:
-    url = 'http://hudson.openmicroscopy.org.uk/view/2.%20Stable/job/OMERO-stable-ice34/api/python?depth=1'
+def parseArgs():
+    parser = argparse.ArgumentParser(
+        description='Build an OMERO RPM from a Hudson build')
+    parser.add_argument('--build', help='Hudson job build number', type=int)
+    parser.add_argument('--job', help='Hudson job name', type=str,
+                        default=defaultJob)
+    parser.add_argument('--dryrun', help='Show what would be done',
+                        action='store_true')
+    args = parser.parse_args()
+    print 'build:%s job:%s%s' % (
+        args.build, args.job, ' (dryrun)' if args.dryrun else '')
+    return args
+
+
+args = parseArgs()
+
+url = 'http://hudson.openmicroscopy.org.uk/view/All/job/'
+url += args.job
+
+if args.build:
+    url += '/' + str(args.build)
+
+url += '/api/python?depth=1'
 
 rpm_source_dir = '../SOURCES/'
 
-def downloadArtifact(url, dest, overwrite=False):
+def downloadArtifact(url, dest, overwrite=False, dryrun=False):
     if not overwrite:
         if os.path.exists(dest):
             print '%s exists, not overwriting' % dest
             return
     r = urllib2.urlopen(url)
     print 'Downloading to %s' % dest
+    if dryrun:
+        return
     with open(dest, 'wb') as f:
         try:
             shutil.copyfileobj(r, f)
@@ -85,13 +100,13 @@ def downloadArtifact(url, dest, overwrite=False):
 # 4.4.7-RC1-ice34-b241
 # 4.4.7-RC1-46-708f7f0-ice34-b243
 # 4.4.7-ice34-b245
-versionre = '((\d+\.\d+\.\d+)-((\w+)-)?([\w-]+)?ice34-b(\d+))'
+versionre = '((\d+\.\d+\.\d+)-((\w+)-)?([\w-]+)?ice\d+-b(\d+))'
 required = [('OMERO.server-', '.zip'),
             ('OMERO.insight-', '.zip'),
             ('OMERO.importer-', '.zip')]
 
 a = ast.literal_eval(urllib2.urlopen(url).read())
-if buildnum:
+if args.build:
     lastSuccess = a
 else:
     lastSuccess = a['lastSuccessfulBuild']
@@ -112,8 +127,11 @@ for art in arts:
                 version = m.groups()
             else:
                 assert(m.groups() == version)
-            downloadArtifact(art[1], rpm_source_dir + art[0])
+            downloadArtifact(
+                art[1], rpm_source_dir + art[0], dryrun=args.dryrun)
 
+
+rpm_name = args.job.lower()
 build_version = version[0]
 rpm_version = version[1]
 rpm_release = version[5]
@@ -121,7 +139,7 @@ if version[3] is not None:
     rpm_release += '.' + version[3]
 
 rpmspec = """
-Name:           omero-bin
+Name:           %NAME%
 Version:        %VERSION%
 Release:        %RELEASE%%{?dist}
 Summary:        Open Microscopy Environment
@@ -384,14 +402,17 @@ cp omero-httpd.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/omero.conf
 """
 
 
+rpmspec = rpmspec.replace('%NAME%', rpm_name)
 rpmspec = rpmspec.replace('%BUILD_VERSION%', build_version)
 rpmspec = rpmspec.replace('%HUDSON_SOURCE_URL%', baseurl)
 rpmspec = rpmspec.replace('%VERSION%', rpm_version)
 rpmspec = rpmspec.replace('%RELEASE%', rpm_release)
 rpmspec = rpmspec.replace('%DATE%',
                           time.strftime('%a %b %e %Y', time.localtime()))
-specfile = 'omero-bin-%s.spec' % build_version
+specfile = '%s-%s.spec' % (rpm_name, build_version)
 print 'Writing %s' % specfile
-with open(specfile, 'w') as f:
-    f.write(rpmspec)
+
+if not args.dryrun:
+    with open(specfile, 'w') as f:
+        f.write(rpmspec)
 
