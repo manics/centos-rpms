@@ -1,12 +1,12 @@
 %define pyname pyslid
 %define pyversion 0.0.2
-%define githash 63d49e9
+%define githash bac18eb
 
 Summary: Protein Subcellular Location Image Database for OMERO
 Name: python-%{pyname}
 # Experimental with custom modfications, so use a low version for now
 Version: 0.0.2
-Release: 2
+Release: 3
 # Source archive created with
 # $ python setup.py sdist
 # $ mv dist/pyslid-0.0.2.tar.gz dist/pyslid-0.0.2-`git describe --always`.tar.gz
@@ -45,6 +45,10 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+
+* Thu Jun 13 2013 Simon Li <spli@dundee.ac.uk> - 0.0.2-3
+- Trap pyslic errors when an incorrect number of features is returned
+- Built from https://github.com/manics/pyslid/tree/bac18eb7d34498861f974936d44a756afdaa79cb
 
 * Wed Jun 12 2013 Simon Li <spli@dundee.ac.uk> - 0.0.2-2
 - Fix order of parameters passed to getPlane in feature calculation
