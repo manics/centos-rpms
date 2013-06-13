@@ -1,8 +1,8 @@
-%define githash 0f8ba30
+%define githash 48fb37b
 
 Summary: OMERO.searcher
 Name: omero-searcher
-Version: 0.0.2
+Version: 0.0.3
 Release: 1%{?dist}
 Source0: omero-searcher-%{githash}.tar.gz
 License: GPLv3
@@ -20,8 +20,7 @@ Requires:       python-ricerca
 Image search for OMERO.
 
 Source archive created using
-git archive --prefix=omero_searcher/ -o omero-searcher-`git describe --always`.tar.gz 0f8ba30de6d8089215464de14899539026e6d2bf
-
+git archive --prefix=omero_searcher/ -o omero-searcher-`git describe --always`.tar.gz 48fb37bc461bae88f716ab5d81736741801e2642
 
 %prep
 %setup -n omero_searcher
@@ -62,10 +61,15 @@ service omero-web restart
 
 %changelog
 
-* Wed Jun 05 2013 Simon Li<spli@dundee.ac.uk> - 0.0.2-1
+* Wed Jun 23 2013 Simon Li <spli@dundee.ac.uk> - 0.0.3-1
+- Script improvements
+- User filtering
+- Built from https://github.com/manics/omero_searcher/tree/48fb37bc461bae88f716ab5d81736741801e2642
+
+* Wed Jun 05 2013 Simon Li <spli@dundee.ac.uk> - 0.0.2-1
 - Support for C/Z/T selection
 - Built from https://github.com/manics/omero_searcher/tree/0f8ba30de6d8089215464de14899539026e6d2bf
 
-* Wed Apr 24 2013 Simon Li<spli@dundee.ac.uk> - 0.0.1-1
+* Wed Apr 24 2013 Simon Li <spli@dundee.ac.uk> - 0.0.1-1
 - Initial package
 - Built from https://github.com/manics/omero_searcher/tree/05de4c65838ddc80eae9ea2d7c0c1b0da80afd6f
