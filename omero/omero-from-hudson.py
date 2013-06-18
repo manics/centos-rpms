@@ -168,8 +168,12 @@ Requires:       omero-web = %{version}
 Requires:       omero-clients = %{version}
 
 %global omerodir /opt/omero
-# Binaries are prebuilt, so don't do any post-processing
-%global __os_install_post %{nil}
+# Binaries are prebuilt, so disable all post-processing other than python
+# bytecompile
+%global __os_install_post \\
+    /usr/lib/rpm/brp-python-bytecompile \\
+    /usr/lib/rpm/redhat/brp-python-hardlink \\
+%{nil}
 # We don't want internal libraries to be used by any other packages
 AutoProv:       no
 
