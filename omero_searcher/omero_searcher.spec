@@ -61,12 +61,12 @@ service omero-web restart
 
 %changelog
 
-* Wed Jun 14 2013 Simon Li <spli@dundee.ac.uk> - 0.0.4-1
+* Fri Jun 14 2013 Simon Li <spli@dundee.ac.uk> - 0.0.4-1
 - Script UI improvements
 - More feature calculation error handling
 - Built from https://github.com/manics/omero_searcher/tree/d612eed69564bce1f82a6e69dba0eb30615667b4
 
-* Wed Jun 13 2013 Simon Li <spli@dundee.ac.uk> - 0.0.3-1
+* Thu Jun 13 2013 Simon Li <spli@dundee.ac.uk> - 0.0.3-1
 - Script improvements
 - User filtering
 - Built from https://github.com/manics/omero_searcher/tree/48fb37bc461bae88f716ab5d81736741801e2642
