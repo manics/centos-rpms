@@ -1,10 +1,8 @@
-%define githash a65d06d
-
 Summary: OMERO.searcher
 Name: omero-searcher
-Version: 0.0.5
+Version: 0.0.6
 Release: 1%{?dist}
-Source0: omero-searcher-%{githash}.tar.gz
+Source0: omero-searcher-%{version}.tar.gz
 License: GPLv3
 Group: Development/Libraries
 BuildArch: noarch
@@ -20,7 +18,7 @@ Requires:       python-ricerca
 Image search for OMERO.
 
 Source archive created using
-git archive --prefix=omero_searcher/ -o omero-searcher-`git describe --always`.tar.gz a0db01f89818535260ca86dc51ef3ebb6bc81324
+git archive --prefix=omero_searcher/ -o omero-searcher-0.0.6.tar.gz 58a3f51cdd37ab5303e4039ac85970670d681df1
 
 %prep
 %setup -n omero_searcher
@@ -60,6 +58,10 @@ service omero-web restart
 %attr(-,omero,omero) /OMERO/pyslid.data
 
 %changelog
+
+* Thu Jun 20 2013 Simon Li <spli@dundee.ac.uk> - 0.0.6-1
+- Don't return an error if no filters selected and enable_filters disabled
+- Built from https://github.com/manics/omero_searcher/tree/58a3f51cdd37ab5303e4039ac85970670d681df1
 
 * Wed Jun 19 2013 Simon Li <spli@dundee.ac.uk> - 0.0.5-1
 - Filter by channel names
