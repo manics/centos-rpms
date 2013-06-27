@@ -1,6 +1,6 @@
 Summary: OMERO.searcher
 Name: omero-searcher
-Version: 0.0.6
+Version: 0.0.7
 Release: 1%{?dist}
 Source0: omero-searcher-%{version}.tar.gz
 License: GPLv3
@@ -18,7 +18,7 @@ Requires:       python-ricerca
 Image search for OMERO.
 
 Source archive created using
-git archive --prefix=omero_searcher/ -o omero-searcher-0.0.6.tar.gz 58a3f51cdd37ab5303e4039ac85970670d681df1
+git archive --prefix=omero_searcher/ -o omero-searcher-0.0.7.tar.gz f233a09712dbd6a0360adcf8a77d6f3f7d62e6f5
 
 %prep
 %setup -n omero_searcher
@@ -58,6 +58,10 @@ service omero-web restart
 %attr(-,omero,omero) /OMERO/pyslid.data
 
 %changelog
+
+* Fri Jun 28 2013 Simon Li <spli@dundee.ac.uk> - 0.0.7-1
+- Minor filter UI changes
+- Built from https://github.com/manics/omero_searcher/tree/f233a09712dbd6a0360adcf8a77d6f3f7d62e6f5
 
 * Thu Jun 20 2013 Simon Li <spli@dundee.ac.uk> - 0.0.6-1
 - Don't return an error if no filters selected and enable_filters disabled
