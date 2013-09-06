@@ -1,8 +1,8 @@
 Summary: OMERO.searcher
 Name: omero-searcher
-Version: 0.0.7
+Version: 0.0.8
 Release: 1%{?dist}
-Source0: omero-searcher-%{version}.tar.gz
+Source0: http://hudson.openmicroscopy.org.uk/job/ANALYSIS-OMERO-SEARCHER-merge/lastSuccessfulBuild/artifact/dist/OMERO-searcher-e8a2d53-b82.zip
 License: GPLv3
 Group: Development/Libraries
 BuildArch: noarch
@@ -10,24 +10,23 @@ Url: http://murphylab.web.cmu.edu/software/
 
 %global omerodir /opt/omero
 
-Requires:       omero-server >= 4.4.7
-Requires:       python-pyslid >= 0.0.2
-Requires:       python-ricerca
+Requires:       omero-server >= 4.4.8
+Requires:       python-pyslid >= 0.0.3
+Requires:       python-ricerca >= 0.0.2
 
 %description
 Image search for OMERO.
 
-Source archive created using
-git archive --prefix=omero_searcher/ -o omero-searcher-0.0.7.tar.gz f233a09712dbd6a0360adcf8a77d6f3f7d62e6f5
+Built from the OMERO Hudson CI ANALYSIS-OMERO-SEARCHER-merge job.
 
 %prep
-%setup -n omero_searcher
+%setup -n OMERO-searcher
 
 %build
 
 %install
 mkdir -p %{buildroot}%{omerodir}/server/lib/python/omeroweb/omero_searcher
-cp -a *.py templates \
+cp -a *.py templates templatetags \
     %{buildroot}%{omerodir}/server/lib/python/omeroweb/omero_searcher
 mkdir -p %{buildroot}%{omerodir}/server/lib/scripts/searcher
 cp -a scripts/*.py %{buildroot}%{omerodir}/server/lib/scripts/searcher
@@ -58,6 +57,9 @@ service omero-web restart
 %attr(-,omero,omero) /OMERO/pyslid.data
 
 %changelog
+* Fri Sep  6 2013  <spli@dundee.ac.uk> - 0.0.8-1
+- Switch to using package created by Hudson CI merge build
+  ANALYSIS-OMERO-SEARCHER-merge
 
 * Fri Jun 28 2013 Simon Li <spli@dundee.ac.uk> - 0.0.7-1
 - Minor filter UI changes

@@ -1,32 +1,30 @@
 %define pyname pyslid
-%define pyversion 0.0.2
-%define githash bac18eb
+%define pyversion 1.0
 
 Summary: Protein Subcellular Location Image Database for OMERO
 Name: python-%{pyname}
-# Experimental with custom modfications, so use a low version for now
-Version: 0.0.2
-Release: 3
-# Source archive created with
-# $ python setup.py sdist
-# $ mv dist/pyslid-0.0.2.tar.gz dist/pyslid-0.0.2-`git describe --always`.tar.gz
-Source0: %{pyname}-%{pyversion}-%{githash}.tar.gz
+Version: 0.0.3
+Release: 1
+Source0: http://hudson.openmicroscopy.org.uk/job/ANALYSIS-OMERO-PYSLID-merge/lastSuccessfulBuild/artifact/src/dist/pyslid-1.0-6f456ef-b74.tar.gz
 License: GPLv3
 Group: Development/Libraries
 BuildArch: noarch
 Vendor: Robert F. Murphy <murphy@cmu.edu>
 Url: http://murphylab.web.cmu.edu/software/
 
-Requires: omero-server >= 4.4.7
+Requires: omero-server >= 4.4.8
 
 Requires: numpy >= 1.4.1
 Requires: scipy >= 0.7.2
+BuildRequires: python-setuptools
 Requires: python-PySLIC = 0.6.1
 
 %description
 Protein Subcellular Location Image Database for OMERO
 
 This is a forked version with additional bug fixes and workarounds.
+
+Built from the OMERO Hudson CI ANALYSIS-OMERO-PYSLID-merge job.
 
 %prep
 %setup -n %{pyname}-%{pyversion}
@@ -45,6 +43,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Sep  6 2013  <spli@dundee.ac.uk> - 0.0.3-1
+- Switch to using package created by Hudson CI merge build
+  ANALYSIS-OMERO-PYSLID-merge
 
 * Thu Jun 13 2013 Simon Li <spli@dundee.ac.uk> - 0.0.2-3
 - Trap pyslic errors when an incorrect number of features is returned
